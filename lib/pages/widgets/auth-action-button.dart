@@ -44,6 +44,7 @@ class _AuthActionButtonState extends State<AuthActionButton> {
     await _dataBaseService.saveData(user, password, predictedData);
 
     print("***** imagee ** image *****" + predictedData.toString());
+    //   print("***** user ** user *****" + user.toString());
 
     /// resets the face stored in the face net sevice
     this._faceNetService.setPredictedData(null);

@@ -30,22 +30,14 @@ class FaceNetService {
 
   Future loadModel() async {
     try {
-      final gpuDelegateV2 = tflite.GpuDelegateV2(
-          options: tflite.GpuDelegateOptionsV2(
-              false,
-              tflite.TfLiteGpuInferenceUsage.fastSingleAnswer,
-              tflite.TfLiteGpuInferencePriority.minLatency,
-              tflite.TfLiteGpuInferencePriority.auto,
-              tflite.TfLiteGpuInferencePriority.auto));
-
       var interpreterOptions = tflite.InterpreterOptions()
-        ..addDelegate(gpuDelegateV2);
+        ..useNnApiForAndroid = true;
       this._interpreter = await tflite.Interpreter.fromAsset(
           'mobilefacenet.tflite',
           options: interpreterOptions);
       print('model loaded successfully');
     } catch (e) {
-      print('Failed to load model.');
+      print('Failed to load model. ' + e.toString());
       print(e);
     }
   }
@@ -56,11 +48,16 @@ class FaceNetService {
 
     /// then reshapes input and ouput to model format 🧑‍🔧
     input = input.reshape([1, 112, 112, 3]);
+    print("******** image 0000********* : " + input.toString());
+
     List output = List.generate(1, (index) => List.filled(192, 0));
+
+    print("******** image 11111********* : " + output.toString());
 
     /// runs and transforms the data 🤖
     this._interpreter.run(input, output);
     output = output.reshape([192]);
+    print("******** image list ********* : " + output.toString());
 
     this._predictedData = List.from(output);
   }
