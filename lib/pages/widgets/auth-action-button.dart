@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:faceTest/pages/db/database.dart';
@@ -54,7 +55,6 @@ class _AuthActionButtonState extends State<AuthActionButton> {
 
   Future _signIn(context) async {
     String password = _passwordTextEditingController.text;
-
     if (this.predictedUser.password == password) {
       Navigator.push(
           context,
@@ -98,8 +98,8 @@ class _AuthActionButtonState extends State<AuthActionButton> {
               }
             }
             PersistentBottomSheetController bottomSheetController =
-                Scaffold.of(context)
-                    .showBottomSheet((context) => signSheet(context));
+                Scaffold.of(context).showBottomSheet((context) =>
+                    widget.isLogin ? signSheet(context) : signSheetUp(context));
 
             bottomSheetController.closed.whenComplete(() => widget.reload());
           }
@@ -207,7 +207,60 @@ class _AuthActionButtonState extends State<AuthActionButton> {
                         : Container(),
               ],
             ),
-          ),
+          )
+        ],
+      ),
+    );
+  }
+
+  signSheetUp(context) {
+    var userAndPass = _predictUser();
+    if (userAndPass != null) {
+      this.predictedUser = User.fromDB(userAndPass);
+    }
+    return Container(
+      padding: EdgeInsets.all(20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          predictedUser == null
+              ? Container(
+                  child: Column(
+                    children: [
+                      AppTextField(
+                        controller: _userTextEditingController,
+                        labelText: "Your Name",
+                      ),
+                      SizedBox(height: 10),
+                      AppTextField(
+                        controller: _passwordTextEditingController,
+                        labelText: "Password",
+                        isPassword: true,
+                      ),
+                      SizedBox(height: 10),
+                      Divider(),
+                      SizedBox(height: 10),
+                      AppButton(
+                        text: 'SIGN UP',
+                        onPressed: () async {
+                          await _signUp(context);
+                        },
+                        icon: Icon(
+                          Icons.person_add,
+                          color: Colors.white,
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              : Container(
+                  alignment: Alignment.center,
+                  width: MediaQuery.of(context).size.width,
+                  child: Text(
+                    'User existe 😞 :' + this.predictedUser.user,
+                    style: TextStyle(fontSize: 20),
+                  )),
         ],
       ),
     );
