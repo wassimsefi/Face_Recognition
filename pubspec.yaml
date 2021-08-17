@@ -35,7 +35,8 @@ dependencies:
   url_launcher: 
   font_awesome_flutter: 
   image:
-  tflite_flutter: 
+  tflite_flutter:
+  http: ^0.12.0
 
 
 

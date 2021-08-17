@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
 
@@ -9,6 +10,7 @@ import 'package:faceTest/services/camera.service.dart';
 import 'package:faceTest/services/facenet.service.dart';
 import 'package:flutter/material.dart';
 import '../home.dart';
+import 'package:http/http.dart' as http;
 import 'app_text_field.dart';
 
 class AuthActionButton extends StatefulWidget {
@@ -35,6 +37,43 @@ class _AuthActionButtonState extends State<AuthActionButton> {
 
   User predictedUser;
 
+  /*Future<User> createUser(String user, String password, String p) async {
+    final String apiUrl = "http://localhost:3000/api/userModel/signup";
+    final Response = await http.post(apiUrl,
+        body: {"firstName": user, "password": password, "image": p});
+
+    if (Response.statusCode == 201) {
+      print("success create user !!");
+    } else {
+      print("error create user !!");
+      return null;
+    }
+  }
+*/
+  Future<User> createUser(String user, String password, List<dynamic> p) async {
+    final response = await http.post(
+      Uri.parse('http://192.168.1.5:3000/api/userModel/signup'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        "userName": user,
+        "password": password,
+        "image": p
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      // If the server did return a 201 CREATED response,
+      // then parse the JSON.
+      print("success create user !!");
+    } else {
+      // If the server did not return a 201 CREATED response,
+      // then throw an exception.
+      throw Exception('Failed to create user.');
+    }
+  }
+
   Future _signUp(context) async {
     /// gets predicted data from facenet service (user face detected)
     List predictedData = _faceNetService.predictedData;
@@ -43,6 +82,15 @@ class _AuthActionButtonState extends State<AuthActionButton> {
 
     /// creates a new user in the 'database'
     await _dataBaseService.saveData(user, password, predictedData);
+    await createUser(user, password, predictedData);
+
+    print("**********************Users/Sign UP****************************");
+
+    print("name :" + user);
+    print("password :" + password);
+    print("image :" + predictedData.toString());
+
+    print("************************end****************************");
 
     print("***** imagee ** image *****" + predictedData.toString());
     //   print("***** user ** user *****" + user.toString());
@@ -53,8 +101,18 @@ class _AuthActionButtonState extends State<AuthActionButton> {
         MaterialPageRoute(builder: (BuildContext context) => MyHomePage()));
   }
 
-  Future _signIn(context) async {
+  Future _signIn(context, User predictedUser) async {
     String password = _passwordTextEditingController.text;
+    Map<String, dynamic> data = _dataBaseService.db;
+
+    print("**********************Users/login****************************");
+
+    print("name :" + this.predictedUser.user);
+    print(
+        "image :" + data[this.predictedUser.user + ":" + password].toString());
+
+    print("************************end****************************");
+
     if (this.predictedUser.password == password) {
       Navigator.push(
           context,
@@ -186,7 +244,7 @@ class _AuthActionButtonState extends State<AuthActionButton> {
                     ? AppButton(
                         text: 'LOGIN',
                         onPressed: () async {
-                          _signIn(context);
+                          _signIn(context, predictedUser);
                         },
                         icon: Icon(
                           Icons.login,
