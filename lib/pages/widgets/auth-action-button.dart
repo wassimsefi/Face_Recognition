@@ -52,7 +52,7 @@ class _AuthActionButtonState extends State<AuthActionButton> {
 */
   Future<User> createUser(String user, String password, List<dynamic> p) async {
     final response = await http.post(
-      Uri.parse('http://192.168.1.5:3000/api/userModel/signup'),
+      Uri.parse('http://192.168.1.6:3000/api/userModel/signup'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -135,6 +135,7 @@ class _AuthActionButtonState extends State<AuthActionButton> {
 
   String _predictUser() {
     String userAndPass = _faceNetService.predict();
+
     return userAndPass ?? null;
   }
 
@@ -147,7 +148,6 @@ class _AuthActionButtonState extends State<AuthActionButton> {
           await widget._initializeControllerFuture;
           // onShot event (takes the image and predict output)
           bool faceDetected = await widget.onPressed();
-
           if (faceDetected) {
             if (widget.isLogin) {
               var userAndPass = _predictUser();
@@ -209,7 +209,7 @@ class _AuthActionButtonState extends State<AuthActionButton> {
           widget.isLogin && predictedUser != null
               ? Container(
                   child: Text(
-                    'Welcome back, ' + predictedUser.user + '.',
+                    'Welcome back , ' + predictedUser.user + '.',
                     style: TextStyle(fontSize: 20),
                   ),
                 )
