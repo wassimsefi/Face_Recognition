@@ -52,7 +52,7 @@ class _AuthActionButtonState extends State<AuthActionButton> {
 */
   Future<User> createUser(String user, String password, List<dynamic> p) async {
     final response = await http.post(
-      Uri.parse('http://192.168.1.6:3000/api/userModel/signup'),
+      Uri.parse('https://mighty-shelf-59772.herokuapp.com/signup'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
